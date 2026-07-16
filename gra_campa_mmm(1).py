@@ -718,7 +718,7 @@ try:
         st.write(
             "Comparativa entre la meta académica y la proyección estimada por el modelo."
         )
-
+        # C:\Users\juan_garnicac\Documents\ProyectosVisual\Meridian\presentacion
         df_agrup_proy = (
             df_proy_filtrado.groupby("Periodo Meta")["Proyeccion Cierre (Modelada)"]
             .sum()
@@ -840,7 +840,7 @@ try:
             .reset_index()
             .sort_values(by="Total_Leads", ascending=True)
         )
-
+        # C:\Users\juan_garnicac\Documents\ProyectosVisual\Meridian\presentacion
         fig_canales = px.bar(
             df_grafico,
             y="Fuente Clasificada",
