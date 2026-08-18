@@ -2,13 +2,13 @@
 # paginas/resultados.py - Resultados Ejecutivos
 # =============================================================================
 
-import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
+import plotly.graph_objects as go
+import streamlit as st
 
 
-def render(df_filtrado, df_raw):  # ← DEBE ACEPTAR 2 ARGUMENTOS
+def render(df_filtrado, df_raw):  # ← Acepta 2 argumentos
     """Función render que llama index.py"""
 
     st.markdown(
@@ -163,75 +163,6 @@ def render(df_filtrado, df_raw):  # ← DEBE ACEPTAR 2 ARGUMENTOS
     st.write("---")
     st.subheader("📋 Matriz Detallada de Proyecciones")
     st.dataframe(df_filtrado, use_container_width=True)
-
-    df_metricas = pd.DataFrame(metricas_data)
-    st.dataframe(
-        df_metricas,
-        column_config={
-            "Métrica": st.column_config.TextColumn("📊 Métrica", width="medium"),
-            "Qué mide": st.column_config.TextColumn("🔍 ¿Qué mide?", width="large"),
-            "Cómo se calcula": st.column_config.TextColumn(
-                "📐 ¿Cómo se calcula?", width="large"
-            ),
-            "Meta": st.column_config.TextColumn("🎯 Meta", width="small"),
-            "Interpretación": st.column_config.TextColumn(
-                "💡 Interpretación", width="large"
-            ),
-        },
-        hide_index=True,
-        use_container_width=True,
-    )
-
-    # ================================================================
-    # 📋 TABLA DE RECOMENDACIONES - SOLO DOCENTE SELECCIONADO
-    # ================================================================
-    st.write("---")
-    st.subheader("📋 Recomendaciones por Docente")
-
-    if (
-        "nombres_apellidos" in df_filtrado.columns
-        and "recomen_falencia" in df_filtrado.columns
-    ):
-        df_recom = df_filtrado[["nombres_apellidos", "recomen_falencia"]].copy()
-
-        docentes_disponibles = sorted(df_recom["nombres_apellidos"].dropna().unique())
-
-        if len(docentes_disponibles) > 0:
-            opcion_docente = st.selectbox(
-                "👨‍🏫 Seleccionar docente:",
-                options=docentes_disponibles,
-                key="filtro_docente_recomendaciones_final",
-            )
-
-            # Filtrar SOLO el docente seleccionado
-            df_recom = df_recom[df_recom["nombres_apellidos"] == opcion_docente]
-            st.success(f"✅ Mostrando recomendaciones de: **{opcion_docente}**")
-
-            st.dataframe(
-                df_recom,
-                column_config={
-                    "nombres_apellidos": "👨‍🏫 Docente",
-                    "recomen_falencia": "💡 Recomendación",
-                },
-                use_container_width=True,
-                hide_index=True,
-            )
-
-            csv = df_recom.to_csv(index=False).encode("utf-8")
-            st.download_button(
-                label="📥 Descargar CSV",
-                data=csv,
-                file_name=f"recomendaciones_{opcion_docente}.csv",
-                mime="text/csv",
-            )
-        else:
-            st.info("No hay docentes disponibles para mostrar recomendaciones.")
-    else:
-        st.warning(
-            "No se encontraron las columnas 'nombres_apellidos' o 'recomen_falencia'."
-        )
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
