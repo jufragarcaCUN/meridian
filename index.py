@@ -9,10 +9,8 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
+import os
 
-# =============================================================================
-# 1. CONFIGURACIÓN DE RUTAS E IMPORTACIÓN DE MÓDULOS LOCALES
-# =============================================================================
 DIRECTORIO_ACTUAL = Path(__file__).resolve().parent
 CARPETA_PAGINAS = DIRECTORIO_ACTUAL / "paginas"
 
@@ -218,7 +216,42 @@ st.markdown(
 
 
 # =============================================================================
-# 4. CARGA DE DATOS CON SELECTOR DE ARCHIVOS
+# 4. FUNCIÓN PARA OBTENER ARCHIVOS DISPONIBLES DINÁMICAMENTE
+# =============================================================================
+def obtener_archivos_disponibles():
+    """
+    Busca automáticamente archivos Excel en una carpeta 'data' o en el directorio actual.
+    También permite configurar rutas específicas.
+    """
+    archivos = {}
+
+    # Opción 1: Buscar en una carpeta 'data' dentro del directorio del proyecto
+    carpeta_datos = DIRECTORIO_ACTUAL / "data"
+    if carpeta_datos.exists():
+        for archivo in carpeta_datos.glob("*.xlsx"):
+            archivos[archivo.stem] = str(archivo)
+
+    # Opción 2: Buscar en el directorio actual
+    for archivo in DIRECTORIO_ACTUAL.glob("*.xlsx"):
+        if archivo.stem not in archivos:
+            archivos[archivo.stem] = str(archivo)
+
+    # Opción 3: Buscar en subcarpeta 'presentacion' (por compatibilidad)
+    carpeta_presentacion = DIRECTORIO_ACTUAL / "presentacion"
+    if carpeta_presentacion.exists():
+        for archivo in carpeta_presentacion.glob("*.xlsx"):
+            if archivo.stem not in archivos:
+                archivos[archivo.stem] = str(archivo)
+
+    # Si no se encontraron archivos, permitir subir archivo manualmente
+    if not archivos:
+        archivos = {"📤 Subir archivo manual": "manual_upload"}
+
+    return archivos
+
+
+# =============================================================================
+# 5. CARGA DE DATOS CON SELECTOR DE ARCHIVOS
 # =============================================================================
 @st.cache_data
 def cargar_datos(ruta_archivo):
@@ -269,7 +302,20 @@ def cargar_datos(ruta_archivo):
 
 
 # =============================================================================
-# 5. FUNCIÓN PARA MOSTRAR RESEÑA DE MODELOS Y MÉTRICAS
+# 6. FUNCIÓN PARA MANEJAR SUBIDA DE ARCHIVO MANUAL
+# =============================================================================
+def manejar_archivo_manual():
+    """Permite al usuario subir un archivo Excel manualmente"""
+    uploaded_file = st.sidebar.file_uploader(
+        "📤 Subir archivo Excel",
+        type=["xlsx", "xls"],
+        help="Puedes subir tu propio archivo Excel si no está en la lista",
+    )
+    return uploaded_file
+
+
+# =============================================================================
+# 7. FUNCIÓN PARA MOSTRAR RESEÑA DE MODELOS Y MÉTRICAS
 # =============================================================================
 def mostrar_resena_modelos():
     """Muestra una reseña completa de los modelos utilizados y sus métricas en grid de 2 columnas"""
@@ -479,7 +525,7 @@ el rendimiento de las campañas de marketing. Cada modelo aporta una perspectiva
 
 
 # =============================================================================
-# 6. FUNCIÓN PARA MOSTRAR TABLA DE ANÁLISIS
+# 8. FUNCIÓN PARA MOSTRAR TABLA DE ANÁLISIS
 # =============================================================================
 def mostrar_tabla_analisis():
     """Muestra la tabla de análisis de consultas SQL"""
@@ -565,7 +611,7 @@ def mostrar_tabla_analisis():
 
 
 # =============================================================================
-# 7. MAIN - PUNTO DE ENTRADA PRINCIPAL
+# 9. MAIN - PUNTO DE ENTRADA PRINCIPAL
 # =============================================================================
 def main():
     """
@@ -586,31 +632,59 @@ def main():
     # ===== SELECTOR DE ARCHIVOS EXCEL (PRIMERO Y MÁS IMPORTANTE) =====
     st.sidebar.header("📂 Seleccionar Datos")
 
-    # Diccionario con las rutas de los archivos disponibles
-    archivos_disponibles = {
-        "📊 Datos 3500M": r"C:\Users\juan_garnicac\Documents\ProyectosVisual\Meridian\presentacion\3500M.xlsx",
-        "📊 Datos 4250": r"C:\Users\juan_garnicac\Documents\ProyectosVisual\Meridian\presentacion\4250.xlsx",
-        "📊 Datos 5000M": r"C:\Users\juan_garnicac\Documents\ProyectosVisual\Meridian\presentacion\5000M.xlsx",
-    }
+    # Obtener archivos disponibles dinámicamente
+    archivos_disponibles = obtener_archivos_disponibles()
 
-    # Selector de archivo - PRIMER ELEMENTO DEL SIDEBAR
-    archivo_seleccionado = st.sidebar.selectbox(
-        "📁 Seleccionar archivo de datos:",
-        options=list(archivos_disponibles.keys()),
-        index=0,  # Selecciona "Datos 3500M" por defecto
-        help="Selecciona el archivo Excel con los datos de MMM que deseas analizar",
-    )
+    # Mostrar opciones de archivos
+    if len(archivos_disponibles) > 1:
+        # Si hay archivos disponibles, mostrar selector
+        opciones = list(archivos_disponibles.keys())
+        archivo_seleccionado = st.sidebar.selectbox(
+            "📁 Seleccionar archivo de datos:",
+            options=opciones,
+            help="Selecciona el archivo Excel con los datos de MMM que deseas analizar",
+        )
 
-    # Obtener la ruta del archivo seleccionado
-    ruta_archivo = archivos_disponibles[archivo_seleccionado]
+        ruta_archivo = archivos_disponibles[archivo_seleccionado]
 
-    # Mostrar información del archivo seleccionado
-    st.sidebar.info(f"📁 Cargando: {archivo_seleccionado}")
+        # Mostrar información del archivo seleccionado
+        if ruta_archivo != "manual_upload":
+            st.sidebar.info(f"📁 Cargando: {archivo_seleccionado}")
+        else:
+            ruta_archivo = None
+
+    else:
+        # Si no hay archivos, mostrar opción de subir
+        st.sidebar.warning("⚠️ No se encontraron archivos Excel en el proyecto")
+        archivo_seleccionado = "📤 Subir archivo manual"
+        ruta_archivo = None
+
+    # ===== MANEJO DE SUBIDA MANUAL =====
+    uploaded_file = None
+    if ruta_archivo is None or archivo_seleccionado == "📤 Subir archivo manual":
+        uploaded_file = st.sidebar.file_uploader(
+            "📤 Subir archivo Excel",
+            type=["xlsx", "xls"],
+            help="Sube un archivo Excel con los datos de MMM",
+        )
+        if uploaded_file is not None:
+            # Guardar temporalmente el archivo
+            temp_path = DIRECTORIO_ACTUAL / "temp_upload.xlsx"
+            with open(temp_path, "wb") as f:
+                f.write(uploaded_file.getvalue())
+            ruta_archivo = str(temp_path)
+            st.sidebar.success("✅ Archivo subido correctamente")
+        else:
+            st.sidebar.warning("📤 Por favor, sube un archivo para continuar")
+            st.stop()
 
     # ===== CARGA DE DATOS =====
     # Mostrar spinner mientras se cargan los datos
-    with st.spinner(f"Cargando {archivo_seleccionado}..."):
-        df_base = cargar_datos(ruta_archivo)
+    if ruta_archivo and ruta_archivo != "manual_upload":
+        with st.spinner(f"Cargando {archivo_seleccionado}..."):
+            df_base = cargar_datos(ruta_archivo)
+    else:
+        df_base = pd.DataFrame()
 
     # Verificar si los datos se cargaron correctamente
     if df_base.empty:
@@ -618,7 +692,7 @@ def main():
             "❌ Error al cargar los datos. Verifica que el archivo exista y tenga el formato correcto."
         )
         st.error(
-            "No se pudieron cargar los datos. Por favor, verifica la ruta del archivo."
+            "No se pudieron cargar los datos. Por favor, verifica que el archivo sea válido."
         )
         st.stop()
 
@@ -780,14 +854,14 @@ def main():
     <p>📊 Dashboard MMM - CUN &nbsp;|&nbsp; Versión 3.0 &nbsp;|&nbsp; 
     <span style="color: #7FBC03;">Datos actualizados al corte de julio 2026</span></p>
     <p style="font-size: 10px; color: #999;">Desarrollado por el equipo de Data & Analytics - CUN</p>
-    <p style="font-size: 10px; color: #999;">📁 Archivo activo: {archivo_seleccionado}</p>
+    <p style="font-size: 10px; color: #999;">📁 Archivo activo: {archivo_seleccionado if 'archivo_seleccionado' in locals() else 'Archivo subido manualmente'}</p>
 </div>""",
         unsafe_allow_html=True,
     )
 
 
 # =============================================================================
-# 8. PUNTO DE ENTRADA
+# 10. PUNTO DE ENTRADA
 # =============================================================================
 if __name__ == "__main__":
     main()
