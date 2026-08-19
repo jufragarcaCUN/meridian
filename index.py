@@ -19,19 +19,8 @@ if str(DIRECTORIO_ACTUAL) not in sys.path:
 if str(CARPETA_PAGINAS) not in sys.path:
     sys.path.insert(0, str(CARPETA_PAGINAS))
 
-# IMPORTAR LOS MÓDULOS DE PÁGINAS
-try:
-    from paginas import presentacion
-    from paginas import resultados
-except ModuleNotFoundError as e:
-    st.error(f"Error al importar módulos: {e}")
-    st.info(
-        "Asegúrate de que la carpeta 'paginas/' existe y contiene __init__.py, presentacion.py y resultados.py"
-    )
-    st.stop()
-
 # =============================================================================
-# 2. CONFIGURACIÓN DE LA PÁGINA DE STREAMLIT
+# CONFIGURACIÓN DE LA PÁGINA DE STREAMLIT
 # =============================================================================
 st.set_page_config(
     page_title="Dashboard Marketing & MMM - CUN",
@@ -41,7 +30,7 @@ st.set_page_config(
 )
 
 # =============================================================================
-# 3. ESTILOS CSS GLOBALES
+# ESTILOS CSS GLOBALES
 # =============================================================================
 st.markdown(
     """<style>
@@ -58,229 +47,49 @@ st.markdown(
     color: #666;
     border-top: 1px solid #ddd;
 }
-.seccion-contenedor { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); }
-.seccion-contenedor h2 { color: #7FBC03; font-size: 28px; margin-bottom: 20px; border-bottom: 3px solid #7FBC03; padding-bottom: 12px; }
-.explicacion-tecnica {
-    background: #f8fafc;
-    border-left: 5px solid #7FBC03;
-    padding: 20px 25px;
-    border-radius: 10px;
-    margin: 20px 0;
-    font-size: 16px;
-    line-height: 1.8;
-}
-.modelo-card {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 8px 0;
-    border: 1px solid #e8ecf0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-.modelo-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    transform: translateY(-2px);
-}
-.modelo-card h4 {
-    color: #7FBC03;
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 17px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.modelo-card .badge {
-    background: #7FBC03;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .badge-google {
-    background: #4285F4;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .badge-meta {
-    background: #1877F2;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .badge-prediction {
-    background: #E37400;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .badge-efficiency {
-    background: #00A86B;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .badge-segmentation {
-    background: #8B5CF6;
-    color: white;
-    font-size: 10px;
-    padding: 2px 12px;
-    border-radius: 20px;
-    font-weight: bold;
-}
-.modelo-card .detalle {
-    color: #555;
-    font-size: 14px;
-    line-height: 1.7;
-}
-.modelo-card .formula {
-    background: #f0f4f8;
-    padding: 10px 16px;
-    border-radius: 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    margin: 10px 0;
-    color: #1d2939;
-    border: 1px solid #e2e8f0;
-}
-.modelo-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
-    margin: 15px 0;
-}
-@media (max-width: 768px) {
-    .modelo-grid {
-        grid-template-columns: 1fr;
-    }
-}
-.resena-general {
-    background: linear-gradient(135deg, #f0f7f0 0%, #e8f0e8 100%);
-    border-radius: 15px;
-    padding: 25px 30px;
-    margin-bottom: 30px;
-    border-left: 6px solid #7FBC03;
-}
-.resena-general h3 {
-    color: #2d5a2d;
-    margin-top: 0;
-}
-.resena-general ul {
-    margin-bottom: 0;
-    line-height: 1.8;
-}
-.resena-general li {
-    margin-bottom: 8px;
-}
-.metrica-item {
-    background: #f8fafc;
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin: 10px 0;
-    border-left: 4px solid #7FBC03;
-}
-.metrica-item .formula {
-    font-size: 13px;
-    margin: 6px 0;
-}
-.metrica-item .explicacion {
-    margin: 4px 0;
-    font-size: 13px;
-    color: #444;
-}
-.metrica-item .interpretacion {
-    margin: 4px 0;
-    font-size: 13px;
-    color: #555;
-    background: #e8f0fe;
-    padding: 4px 10px;
-    border-radius: 6px;
-    display: inline-block;
-}
 </style>""",
     unsafe_allow_html=True,
 )
 
 
 # =============================================================================
-# 4. FUNCIÓN PARA OBTENER ARCHIVOS DISPONIBLES DINÁMICAMENTE
+# FUNCIÓN PARA OBTENER ARCHIVOS DISPONIBLES
 # =============================================================================
 def obtener_archivos_disponibles():
-    """
-    Busca automáticamente archivos Excel en una carpeta 'data' o en el directorio actual.
-    También permite configurar rutas específicas.
-    """
     archivos = {}
-
-    # Opción 1: Buscar en una carpeta 'data' dentro del directorio del proyecto
     carpeta_datos = DIRECTORIO_ACTUAL / "data"
     if carpeta_datos.exists():
         for archivo in carpeta_datos.glob("*.xlsx"):
             archivos[archivo.stem] = str(archivo)
-
-    # Opción 2: Buscar en el directorio actual
     for archivo in DIRECTORIO_ACTUAL.glob("*.xlsx"):
         if archivo.stem not in archivos:
             archivos[archivo.stem] = str(archivo)
-
-    # Opción 3: Buscar en subcarpeta 'presentacion' (por compatibilidad)
     carpeta_presentacion = DIRECTORIO_ACTUAL / "presentacion"
     if carpeta_presentacion.exists():
         for archivo in carpeta_presentacion.glob("*.xlsx"):
             if archivo.stem not in archivos:
                 archivos[archivo.stem] = str(archivo)
-
-    # Si no se encontraron archivos, permitir subir archivo manualmente
     if not archivos:
         archivos = {"📤 Subir archivo manual": "manual_upload"}
-
     return archivos
 
 
 # =============================================================================
-# 5. CARGA DE DATOS CON SELECTOR DE ARCHIVOS
+# CARGA DE DATOS
 # =============================================================================
 @st.cache_data
 def cargar_datos(ruta_archivo):
-    """
-    Carga datos desde un archivo Excel especificado.
-
-    Args:
-        ruta_archivo (str): Ruta completa al archivo Excel
-
-    Returns:
-        pd.DataFrame: DataFrame con los datos cargados
-    """
     try:
-        # Intentar cargar con la pestaña específica "Proyecciones_Campanas"
         try:
             df = pd.read_excel(
                 ruta_archivo, sheet_name="Proyecciones_Campanas", engine="openpyxl"
             )
-        except Exception as e:
-            # Si no existe esa pestaña, cargar la primera hoja
+        except:
             st.warning(
-                f"No se encontró la pestaña 'Proyecciones_Campanas'. Cargando la primera hoja disponible."
+                "No se encontró la pestaña 'Proyecciones_Campanas'. Cargando la primera hoja."
             )
             df = pd.read_excel(ruta_archivo, engine="openpyxl")
-
-        # Limpiar nombres de columnas (eliminar espacios al inicio y final)
         df.columns = df.columns.str.strip()
-
-        # Convertir columnas numéricas a tipo float
         cols_numericas = [
             "Oportunidades Totales (Leads)",
             "Matriculas Reales",
@@ -289,420 +98,298 @@ def cargar_datos(ruta_archivo):
             "Proyeccion Cierre (Modelada)",
             "Meta Leads",
         ]
-
         for col in cols_numericas:
             if col in df.columns:
                 df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-
         return df
-
     except Exception as e:
         st.error(f"Error al leer el archivo Excel: {e}")
         return pd.DataFrame()
 
 
 # =============================================================================
-# 6. FUNCIÓN PARA MANEJAR SUBIDA DE ARCHIVO MANUAL
+# FUNCIÓN RENDER - DIBUJA LOS GRÁFICOS DE RESULTADOS
 # =============================================================================
-def manejar_archivo_manual():
-    """Permite al usuario subir un archivo Excel manualmente"""
-    uploaded_file = st.sidebar.file_uploader(
-        "📤 Subir archivo Excel",
-        type=["xlsx", "xls"],
-        help="Puedes subir tu propio archivo Excel si no está en la lista",
-    )
-    return uploaded_file
+def render_resultados(df_filtrado, df_raw):
+    """
+    FUNCIÓN RENDER: Recibe el DataFrame filtrado y el completo, y dibuja los gráficos.
 
+    PARÁMETROS:
+    - df_filtrado: Datos con los filtros aplicados (periodo, programa, fuente)
+    - df_raw: Todos los datos sin filtrar (para metas totales)
 
-# =============================================================================
-# 7. FUNCIÓN PARA MOSTRAR RESEÑA DE MODELOS Y MÉTRICAS
-# =============================================================================
-def mostrar_resena_modelos():
-    """Muestra una reseña completa de los modelos utilizados y sus métricas en grid de 2 columnas"""
+    QUÉ HACE:
+    1. Muestra gráfico de barras: Proyección vs Meta por periodo
+    2. Muestra gráfico de gasto por canal
+    3. Muestra top 10 campañas por cierre modelado
+    4. Muestra volumen de leads por fuente
+    5. Muestra tabla detallada de datos
+    """
 
-    st.markdown("## 🧠 MODELOS UTILIZADOS Y MÉTRICAS")
-
-    # ===== RESEÑA GENERAL =====
     st.markdown(
-        """<div class="resena-general">
-<h3>📖 ¿Cómo funciona este dashboard?</h3>
-<p>Este dashboard integra <strong>4 modelos analíticos</strong> que trabajan en conjunto para predecir y optimizar 
-el rendimiento de las campañas de marketing. Cada modelo aporta una perspectiva única:</p>
-<ul>
-    <li><strong>1. Modelo de Atribución Multi-Touch (MMM):</strong> Distribuye el crédito de conversión entre todos los puntos de contacto</li>
-    <li><strong>2. Modelo de Proyección de Cierre:</strong> Predice el número de estudiantes que se matricularán al final del período</li>
-    <li><strong>3. Modelo de Eficiencia de Campañas:</strong> Calcula el ROI y costo por lead de cada campaña</li>
-    <li><strong>4. Modelo de Segmentación de Audiencia:</strong> Identifica perfiles de estudiantes con mayor probabilidad de conversión</li>
-</ul>
-<p style="margin-top: 12px;"><strong>🎯 Objetivo:</strong> Proporcionar una visión integral del desempeño de marketing para la toma de decisiones estratégicas.</p>
-</div>""",
+        '<div style="background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);">'
+        '<h2 style="color: #7FBC03; font-size: 28px; margin-bottom: 20px; border-bottom: 3px solid #7FBC03; padding-bottom: 12px;">📊 Resultados Ejecutivos y Proyecciones</h2>',
         unsafe_allow_html=True,
     )
 
-    # ===== MODELOS EN GRID DE 2 EN 2 =====
-    st.markdown("### 📊 Detalle de Modelos y Métricas")
+    # Si no hay datos filtrados, mostrar advertencia
+    if df_filtrado.empty:
+        st.warning("⚠️ No hay datos para mostrar con los filtros seleccionados.")
+        return
 
-    modelos = [
-        {
-            "nombre": "Modelo de Atribución Multi-Touch (MMM)",
-            "badge": "ATTRIBUTION",
-            "badge_class": "badge",
-            "emoji": "🎯",
-            "descripcion": "Distribuye el crédito de conversión entre todos los puntos de contacto del cliente (Meta Ads, Google Ads, etc.) basado en su contribución real al funnel de ventas.",
-            "metricas": [
-                {
-                    "nombre": "Oportunidades Totales (Leads)",
-                    "formula": "SUM(leads_generados) - SUM(leads_duplicados)",
-                    "explicacion": "Total de leads únicos generados por todas las campañas, sin duplicados.",
-                    "interpretacion": "Alto = Mayor alcance y captación de interés",
-                },
-                {
-                    "nombre": "Inversión Gasto Distribuido",
-                    "formula": "Σ(Gasto_Campaña_i × Peso_Atribución_i)",
-                    "explicacion": "Gasto total distribuido proporcionalmente según la contribución de cada campaña.",
-                    "interpretacion": "Permite identificar campañas con mejor relación costo-beneficio",
-                },
-                {
-                    "nombre": "Costo por Lead (CPL)",
-                    "formula": "Inversión Total / Leads Totales",
-                    "explicacion": "Costo promedio de adquirir un lead.",
-                    "interpretacion": "Menor = Mayor eficiencia en la captación",
-                },
-            ],
-        },
-        {
-            "nombre": "Modelo de Proyección de Cierre",
-            "badge": "PREDICTION",
-            "badge_class": "badge-prediction",
-            "emoji": "🔮",
-            "descripcion": "Predice el número de estudiantes que se matricularán al final del período basándose en el comportamiento histórico y la tasa de conversión actual.",
-            "metricas": [
-                {
-                    "nombre": "Proyección Cierre (Modelada)",
-                    "formula": "Leads_Actuales × Tasa_Conversión_Histórica × Factor_Estacionalidad",
-                    "explicacion": "Estimación del número de estudiantes que se matricularán al final del período.",
-                    "interpretacion": "Permite planificar recursos y metas",
-                },
-                {
-                    "nombre": "Tasa de Conversión Lead → Matrícula",
-                    "formula": "(Matrículas / Leads) × 100",
-                    "explicacion": "Porcentaje de leads que se convierten en matrículas.",
-                    "interpretacion": "Alto = Mayor calidad de leads y efectividad comercial",
-                },
-            ],
-        },
-        {
-            "nombre": "Modelo de Eficiencia de Campañas",
-            "badge": "EFFICIENCY",
-            "badge_class": "badge-efficiency",
-            "emoji": "📈",
-            "descripcion": "Evalúa el rendimiento de cada campaña calculando el ROI (Retorno de Inversión) y el costo por lead, permitiendo optimizar la asignación de presupuesto.",
-            "metricas": [
-                {
-                    "nombre": "Matrículas Reales",
-                    "formula": "COUNT(matriculas_confirmadas)",
-                    "explicacion": "Número total de estudiantes que se matricularon efectivamente.",
-                    "interpretacion": "Mide el impacto real en el negocio",
-                },
-                {
-                    "nombre": "Meta Estudiantes vs Meta Leads",
-                    "formula": "Meta_Estudiantes = Meta_Leads × 0.15",
-                    "explicacion": "La meta de leads se calcula dividiendo la meta de estudiantes entre la tasa de conversión esperada (15%).",
-                    "interpretacion": "Permite establecer metas realistas basadas en la eficiencia histórica",
-                },
-                {
-                    "nombre": "ROI Estimado",
-                    "formula": "((Matrículas × Valor_Matrícula) - Inversión) / Inversión",
-                    "explicacion": "Retorno de inversión proyectado.",
-                    "interpretacion": "Mayor = Mejor rentabilidad de la campaña",
-                },
-            ],
-        },
-        {
-            "nombre": "Modelo de Segmentación de Audiencia",
-            "badge": "SEGMENTATION",
-            "badge_class": "badge-segmentation",
-            "emoji": "👥",
-            "descripcion": "Identifica perfiles de estudiantes con mayor probabilidad de conversión, segmentando por programa académico, modalidad y comportamiento de navegación.",
-            "metricas": [
-                {
-                    "nombre": "Segmentación por Programa",
-                    "formula": "GROUP BY(Programa_Academico, Modalidad)",
-                    "explicacion": "Agrupa los leads por programa académico y modalidad para identificar qué segmentos generan más conversiones.",
-                    "interpretacion": "Permite enfocar recursos en los programas más rentables",
-                },
-                {
-                    "nombre": "Tasa de Conversión por Segmento",
-                    "formula": "(Matrículas_Segmento / Leads_Segmento) × 100",
-                    "explicacion": "Porcentaje de conversión específico para cada segmento de audiencia.",
-                    "interpretacion": "Identifica segmentos con mejor y peor rendimiento",
-                },
-            ],
-        },
-    ]
+    # ===== GRÁFICO 1: Brecha de Estudiantes =====
+    st.subheader("1. Brecha de Estudiantes: Proyección vs Meta")
 
-    # Mostrar modelos en grid de 2 en 2
-    for i in range(0, len(modelos), 2):
-        par_modelos = modelos[i : i + 2]
-        cols = st.columns(2)
+    df_agrup_proy = (
+        df_filtrado.groupby("Periodo Meta")["Proyeccion Cierre (Modelada)"]
+        .sum()
+        .reset_index()
+    )
 
-        for idx, modelo in enumerate(par_modelos):
-            with cols[idx]:
-                modelo_html = f"""<div class="modelo-card">
-<h4>
-    {modelo['emoji']} {modelo['nombre']}
-    <span class="{modelo['badge_class']}">{modelo['badge']}</span>
-</h4>
-<p class="detalle">{modelo['descripcion']}</p>"""
+    if not df_raw.empty:
+        meta_col = (
+            "Meta Estudiantes"
+            if "Meta Estudiantes" in df_raw.columns
+            else "Meta Estudiantes Asignada"
+        )
+        df_agrup_inv = df_raw.groupby("Periodo Meta")[meta_col].sum().reset_index()
+        meta_map = dict(zip(df_agrup_inv["Periodo Meta"], df_agrup_inv[meta_col]))
+        df_agrup_proy["Meta_Estudiantes"] = (
+            df_agrup_proy["Periodo Meta"].map(meta_map).fillna(0)
+        )
+    else:
+        df_agrup_proy["Meta_Estudiantes"] = 0
 
-                for metrica in modelo["metricas"]:
-                    modelo_html += f"""
-<div class="metrica-item">
-    <strong style="color: #1d2939; font-size: 14px;">📌 {metrica['nombre']}</strong>
-    <div class="formula">
-        <strong>Fórmula:</strong> {metrica['formula']}
+    df_brecha = df_agrup_proy.sort_values(by="Periodo Meta")
+
+    if not df_brecha.empty and df_brecha["Meta_Estudiantes"].sum() > 0:
+        df_brecha["Cumplimiento"] = (
+            df_brecha["Proyeccion Cierre (Modelada)"]
+            / df_brecha["Meta_Estudiantes"].replace(0, 1)
+        ) * 100
+
+        fig_brechas = go.Figure()
+        fig_brechas.add_trace(
+            go.Bar(
+                x=df_brecha["Periodo Meta"],
+                y=df_brecha["Meta_Estudiantes"],
+                name="🎯 Meta Académica",
+                marker_color="#A3B1C6",
+                text=[f"{int(m):,}" for m in df_brecha["Meta_Estudiantes"]],
+                textposition="auto",
+            )
+        )
+
+        colores_cierre = [
+            "#2E7D32" if pct >= 100 else "#F5A623" if pct >= 65 else "#C02424"
+            for pct in df_brecha["Cumplimiento"]
+        ]
+        fig_brechas.add_trace(
+            go.Bar(
+                x=df_brecha["Periodo Meta"],
+                y=df_brecha["Proyeccion Cierre (Modelada)"],
+                name="📈 Proyección Modelada",
+                marker_color=colores_cierre,
+                text=[f"{int(c):,}" for c in df_brecha["Proyeccion Cierre (Modelada)"]],
+                textposition="auto",
+            )
+        )
+        fig_brechas.update_layout(
+            barmode="group", plot_bgcolor="white", margin=dict(l=20, r=20, t=10, b=10)
+        )
+        st.plotly_chart(fig_brechas, use_container_width=True)
+        st.caption(
+            "🟢 Verde = Cumplimiento >= 100% | 🟡 Amarillo = 65% - 99% | 🔴 Rojo = < 65%"
+        )
+    else:
+        st.info("ℹ️ No hay datos suficientes para mostrar las metas.")
+
+    # ===== GRÁFICO 2: Distribución de Gasto y Top Campañas =====
+    st.write("---")
+    st.subheader("2. Distribución de Gasto y Top Campañas")
+
+    col_g1, col_g2 = st.columns([40, 60])
+
+    with col_g1:
+        if "Fuente Clasificada" in df_filtrado.columns:
+            df_gasto_canal = (
+                df_filtrado.groupby("Fuente Clasificada")["Inversion Gasto Distribuido"]
+                .sum()
+                .reset_index()
+            )
+            fig_gasto = px.bar(
+                df_gasto_canal,
+                x="Fuente Clasificada",
+                y="Inversion Gasto Distribuido",
+                color="Fuente Clasificada",
+                title="💰 Presupuesto por Canal",
+                text_auto=".2s",
+                color_discrete_sequence=px.colors.qualitative.Safe,
+            )
+            st.plotly_chart(fig_gasto, use_container_width=True)
+
+    with col_g2:
+        df_cierres_campana = (
+            df_filtrado.groupby("Campana Mercadeo")["Proyeccion Cierre (Modelada)"]
+            .sum()
+            .reset_index()
+        )
+        df_cierres_campana = df_cierres_campana.sort_values(
+            by="Proyeccion Cierre (Modelada)", ascending=False
+        ).head(10)
+        fig_cierres_cam = px.bar(
+            df_cierres_campana,
+            y="Campana Mercadeo",
+            x="Proyeccion Cierre (Modelada)",
+            orientation="h",
+            title="🏆 Top 10 Campañas por Cierre Modelado",
+            text_auto=".1f",
+            color="Proyeccion Cierre (Modelada)",
+            color_continuous_scale=px.colors.sequential.Magenta,
+        )
+        st.plotly_chart(fig_cierres_cam, use_container_width=True)
+
+    # ===== GRÁFICO 3: Volumen de Leads por Fuente =====
+    st.write("---")
+    st.subheader("3. Volumen de Leads por Fuente")
+
+    if "Fuente Clasificada" in df_filtrado.columns:
+        df_grafico = (
+            df_filtrado.groupby("Fuente Clasificada")
+            .agg(Total_Leads=("Oportunidades Totales (Leads)", "sum"))
+            .reset_index()
+            .sort_values(by="Total_Leads", ascending=True)
+        )
+        if not df_grafico.empty:
+            fig_canales = px.bar(
+                df_grafico,
+                y="Fuente Clasificada",
+                x="Total_Leads",
+                orientation="h",
+                color="Total_Leads",
+                color_continuous_scale=px.colors.sequential.Blugrn,
+                text_auto=".s",
+                title="👥 Volumen de Leads por Fuente",
+            )
+            st.plotly_chart(fig_canales, use_container_width=True)
+
+    # ===== TABLA DETALLADA =====
+    st.write("---")
+    st.subheader("📋 Matriz Detallada de Proyecciones")
+    st.dataframe(df_filtrado, use_container_width=True)
+
+
+# =============================================================================
+# FUNCIÓN PARA MOSTRAR RESEÑA DE MODELOS
+# =============================================================================
+def mostrar_resena_modelos():
+    st.markdown("## 🧠 MODELOS UTILIZADOS Y MÉTRICAS")
+    st.markdown(
+        """
+    <div style="background: #f8fafc; border-radius: 10px; padding: 20px; border-left: 5px solid #7FBC03;">
+    <h4>📖 Resumen de Modelos</h4>
+    <p>Este dashboard integra 4 modelos analíticos:</p>
+    <ul>
+        <li><strong>1. MMM (Atribución Multi-Touch):</strong> Distribuye el crédito de conversión entre todos los puntos de contacto</li>
+        <li><strong>2. Proyección de Cierre:</strong> Predice estudiantes que se matricularán al final del período</li>
+        <li><strong>3. Eficiencia de Campañas:</strong> Calcula ROI y costo por lead</li>
+        <li><strong>4. Segmentación de Audiencia:</strong> Identifica perfiles con mayor conversión</li>
+    </ul>
     </div>
-    <p class="explicacion">
-        <strong>📖 Explicación:</strong> {metrica['explicacion']}
-    </p>
-    <span class="interpretacion">
-        💡 {metrica['interpretacion']}
-    </span>
-</div>"""
-
-                modelo_html += "\n</div>"
-                st.markdown(modelo_html, unsafe_allow_html=True)
-
-    # ===== RESUMEN DE FUENTES =====
-    st.markdown("---")
-    st.markdown("### 🔗 Fuentes de Datos por Modelo")
-
-    fuentes_data = [
-        {
-            "Modelo": "Atribución Multi-Touch",
-            "Fuente Principal": "Registros_CRM (CUN_REPOSITORIO.CRM)",
-            "Tablas Relacionadas": "METAADS, GoogleAds, Base_Personas (Zoho)",
-            "Periodicidad": "Diaria",
-        },
-        {
-            "Modelo": "Proyección de Cierre",
-            "Fuente Principal": "Registros_CRM + Periodos_Calendario",
-            "Tablas Relacionadas": "financiera.metas, Base_Personas",
-            "Periodicidad": "Semanal",
-        },
-        {
-            "Modelo": "Eficiencia de Campañas",
-            "Fuente Principal": "METAADS + GoogleAds",
-            "Tablas Relacionadas": "Registros_CRM (JOIN), financiera.metas",
-            "Periodicidad": "Diaria",
-        },
-        {
-            "Modelo": "Segmentación de Audiencia",
-            "Fuente Principal": "Registros_CRM",
-            "Tablas Relacionadas": "Base_Personas, financiera.metas",
-            "Periodicidad": "Semanal",
-        },
-    ]
-
-    df_fuentes = pd.DataFrame(fuentes_data)
-    st.dataframe(
-        df_fuentes,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Modelo": st.column_config.TextColumn("🧠 Modelo", width="medium"),
-            "Fuente Principal": st.column_config.TextColumn(
-                "📂 Fuente Principal", width="large"
-            ),
-            "Tablas Relacionadas": st.column_config.TextColumn(
-                "🔗 Tablas Relacionadas", width="large"
-            ),
-            "Periodicidad": st.column_config.TextColumn(
-                "🔄 Periodicidad", width="small"
-            ),
-        },
+    """,
+        unsafe_allow_html=True,
     )
 
 
 # =============================================================================
-# 8. FUNCIÓN PARA MOSTRAR TABLA DE ANÁLISIS
+# FUNCIÓN PARA MOSTRAR ANÁLISIS DE CONSULTAS
 # =============================================================================
 def mostrar_tabla_analisis():
-    """Muestra la tabla de análisis de consultas SQL"""
-
     st.markdown("## 📊 ANÁLISIS DE CONSULTAS SQL")
-    st.markdown("---")
-
     data = [
         {
             "CONSULTA": "1. INGRESOS",
-            "TABLA PRINCIPAL": "CUN_REPOSITORIO.CRM.Registros_CRM",
-            "PROPÓSITO": "Extraer leads generados por Marketing (Meta y Google)",
-            "COLUMNAS CLAVE": "id_base, número_de_documento, periodo, nombre_de_campaña_mercadeo, programalimpio, canal_fuente, modalidad, fec_crea",
-            "FILTROS IMPORTANTES": "ingreso_lead='ingreso', creador_lead='MARKETING', fuerzacomercial='Contact', canal_fuente IN ('META','GADS')",
-            "QUÉ APORTA": "Total de leads generados, segmentación por campaña, programa, canal y modalidad",
+            "PROPÓSITO": "Extraer leads generados por Marketing",
         },
-        {
-            "CONSULTA": "2. OPORTUNIDADES",
-            "TABLA PRINCIPAL": "CUN_REPOSITORIO.CRM.Registros_CRM",
-            "PROPÓSITO": "Identificar leads que avanzaron a oportunidad (más calificados)",
-            "COLUMNAS CLAVE": "id_base, número_de_documento, periodo, nombre_de_campaña_mercadeo, programalimpio, canal_fuente, modalidad",
-            "FILTROS IMPORTANTES": "tipo_registro='Oportunidad', creador_lead='MARKETING', fuerzacomercial='Contact', canal_fuente IN ('META','GADS')",
-            "QUÉ APORTA": "Base para conversión Lead → Oportunidad",
-        },
+        {"CONSULTA": "2. OPORTUNIDADES", "PROPÓSITO": "Identificar leads calificados"},
         {
             "CONSULTA": "3. MATRÍCULAS",
-            "TABLA PRINCIPAL": "Registros_CRM + Zoho.Base_Personas (JOIN)",
-            "PROPÓSITO": "Identificar estudiantes nuevos que pagaron (matrículas reales)",
-            "COLUMNAS CLAVE": "id_base, periodo, programalimpio AS PROGRAMA, modalidad AS MODALIDA, Fuente_Aspirante, NUEVO, Estado_pago_data",
-            "FILTROS IMPORTANTES": "bp.NUEVO='NUEVO', bp.Estado_pago_data='PAGO', bp.fuerza_comercial_data='CONTACT'",
-            "QUÉ APORTA": "Matrículas reales y tasa de conversión",
+            "PROPÓSITO": "Identificar estudiantes nuevos con pago",
         },
-        {
-            "CONSULTA": "4. METAS",
-            "TABLA PRINCIPAL": "financiera.metas + Periodos_Calendario (JOIN)",
-            "PROPÓSITO": "Obtener metas oficiales de estudiantes y calcular leads necesarios",
-            "COLUMNAS CLAVE": "PROGRAMA_ACADEMICO, MODALIDAD, PERIODO, META (suma), META_LEADS (META/0.15)",
-            "FILTROS IMPORTANTES": "FUERZA_COMERCIAL='CONTACT', fec_inicio BETWEEN '2026-06-01' AND '2026-12-31'",
-            "QUÉ APORTA": "Metas de estudiantes y leads",
-        },
+        {"CONSULTA": "4. METAS", "PROPÓSITO": "Obtener metas oficiales de estudiantes"},
         {
             "CONSULTA": "5. INVERSIÓN",
-            "TABLA PRINCIPAL": "METAADS + GoogleAds (UNION) + Registros_CRM (LEFT JOIN)",
-            "PROPÓSITO": "Calcular inversión por campaña y costo por lead",
-            "COLUMNAS CLAVE": "canal_fuente, CAMPAÑA, INVERSION_1, TOTAL_LEADS, periodo, EJECUTADO_DISTRIBUIDO",
-            "FILTROS IMPORTANTES": "Fechas 2025-2026, tipo_registro='POSIBLE_CLIENTE'",
-            "QUÉ APORTA": "Costo por lead (CPL) y eficiencia",
+            "PROPÓSITO": "Calcular inversión por campaña y CPL",
         },
     ]
-
-    df_analisis = pd.DataFrame(data)
-
-    st.dataframe(
-        df_analisis,
-        use_container_width=True,
-        height=400,
-        column_config={
-            "CONSULTA": st.column_config.TextColumn("CONSULTA", width="small"),
-            "TABLA PRINCIPAL": st.column_config.TextColumn(
-                "TABLA PRINCIPAL", width="medium"
-            ),
-            "PROPÓSITO": st.column_config.TextColumn("PROPÓSITO", width="medium"),
-            "COLUMNAS CLAVE": st.column_config.TextColumn(
-                "COLUMNAS CLAVE", width="large"
-            ),
-            "FILTROS IMPORTANTES": st.column_config.TextColumn(
-                "FILTROS IMPORTANTES", width="large"
-            ),
-            "QUÉ APORTA": st.column_config.TextColumn("QUÉ APORTA", width="large"),
-        },
-    )
-
-    st.markdown("---")
-    st.markdown("### 🔗 RELACIÓN ENTRE CONSULTAS")
-    st.info("""
-    **Relación entre las consultas:**
-    1. **INGRESOS** → Obtiene todos los leads generados por marketing
-    2. **OPORTUNIDADES** → Filtra los leads que avanzaron en el funnel
-    3. **MATRÍCULAS** → Identifica los leads que se convirtieron en estudiantes
-    4. **METAS** → Proporciona los objetivos a alcanzar
-    5. **INVERSIÓN** → Calcula el costo por lead y eficiencia
-    """)
+    st.dataframe(pd.DataFrame(data), use_container_width=True)
 
 
 # =============================================================================
-# 9. MAIN - PUNTO DE ENTRADA PRINCIPAL
+# MAIN
 # =============================================================================
 def main():
-    """
-    Función principal del dashboard.
-    Controla la navegación, carga de datos y renderizado de páginas.
-    """
 
-    # ===== SIDEBAR - CONFIGURACIÓN =====
-    # Encabezado del sidebar con logo de CUN
+    # SIDEBAR
     st.sidebar.markdown(
-        """<div style="background-color: #7FBC03; padding: 10px; text-align: center; border-radius: 8px; margin-bottom: 15px;">
-<h2 style="color: white; margin: 0; font-weight: bold;">🏫 CUN</h2>
-<p style="color: white; margin: 5px 0 0 0; font-size: 11px;">Pipeline Multi-Agente MMM</p>
-</div>""",
+        """<div style="background-color:#7FBC03;padding:10px;text-align:center;border-radius:8px;margin-bottom:15px;">
+    <h2 style="color:white;margin:0;">🏫 CUN</h2>
+    <p style="color:white;margin:5px 0 0 0;font-size:11px;">Pipeline Multi-Agente MMM</p>
+    </div>""",
         unsafe_allow_html=True,
     )
 
-    # ===== SELECTOR DE ARCHIVOS EXCEL (PRIMERO Y MÁS IMPORTANTE) =====
+    # SELECTOR DE ARCHIVOS
     st.sidebar.header("📂 Seleccionar Datos")
-
-    # Obtener archivos disponibles dinámicamente
     archivos_disponibles = obtener_archivos_disponibles()
 
-    # Mostrar opciones de archivos
     if len(archivos_disponibles) > 1:
-        # Si hay archivos disponibles, mostrar selector
         opciones = list(archivos_disponibles.keys())
         archivo_seleccionado = st.sidebar.selectbox(
-            "📁 Seleccionar archivo de datos:",
-            options=opciones,
-            help="Selecciona el archivo Excel con los datos de MMM que deseas analizar",
+            "📁 Seleccionar archivo:", options=opciones
         )
-
         ruta_archivo = archivos_disponibles[archivo_seleccionado]
-
-        # Mostrar información del archivo seleccionado
         if ruta_archivo != "manual_upload":
             st.sidebar.info(f"📁 Cargando: {archivo_seleccionado}")
         else:
             ruta_archivo = None
-
     else:
-        # Si no hay archivos, mostrar opción de subir
-        st.sidebar.warning("⚠️ No se encontraron archivos Excel en el proyecto")
+        st.sidebar.warning("⚠️ No se encontraron archivos Excel")
         archivo_seleccionado = "📤 Subir archivo manual"
         ruta_archivo = None
 
-    # ===== MANEJO DE SUBIDA MANUAL =====
-    uploaded_file = None
+    # SUBIDA MANUAL
     if ruta_archivo is None or archivo_seleccionado == "📤 Subir archivo manual":
         uploaded_file = st.sidebar.file_uploader(
-            "📤 Subir archivo Excel",
-            type=["xlsx", "xls"],
-            help="Sube un archivo Excel con los datos de MMM",
+            "📤 Subir archivo Excel", type=["xlsx", "xls"]
         )
         if uploaded_file is not None:
-            # Guardar temporalmente el archivo
             temp_path = DIRECTORIO_ACTUAL / "temp_upload.xlsx"
             with open(temp_path, "wb") as f:
                 f.write(uploaded_file.getvalue())
             ruta_archivo = str(temp_path)
             st.sidebar.success("✅ Archivo subido correctamente")
         else:
-            st.sidebar.warning("📤 Por favor, sube un archivo para continuar")
+            st.sidebar.warning("📤 Por favor, sube un archivo")
             st.stop()
 
-    # ===== CARGA DE DATOS =====
-    # Mostrar spinner mientras se cargan los datos
+    # CARGA DE DATOS
     if ruta_archivo and ruta_archivo != "manual_upload":
         with st.spinner(f"Cargando {archivo_seleccionado}..."):
             df_base = cargar_datos(ruta_archivo)
     else:
         df_base = pd.DataFrame()
 
-    # Verificar si los datos se cargaron correctamente
+    # VERIFICAR DATOS
     if df_base.empty:
-        st.sidebar.error(
-            "❌ Error al cargar los datos. Verifica que el archivo exista y tenga el formato correcto."
-        )
-        st.error(
-            "No se pudieron cargar los datos. Por favor, verifica que el archivo sea válido."
-        )
+        st.sidebar.error("❌ Error al cargar los datos")
+        st.error("No se pudieron cargar los datos.")
         st.stop()
 
-    # Mostrar confirmación de carga exitosa
-    st.sidebar.success(f"✅ {len(df_base):,} filas cargadas correctamente")
+    st.sidebar.success(f"✅ {len(df_base):,} filas cargadas")
 
-    # Separador visual
+    # NAVEGACIÓN
     st.sidebar.write("---")
-
-    # ===== NAVEGACIÓN =====
     st.sidebar.header("🗺️ Navegación")
     pagina = st.sidebar.radio(
         "Seleccionar Vista:",
@@ -711,157 +398,82 @@ def main():
             "📈 Resultados Ejecutivos",
             "📋 Análisis de Consultas",
         ],
-        help="Selecciona la vista que deseas explorar",
     )
     st.sidebar.write("---")
 
-    # ===== FILTROS DEPENDIENTES (SOLO PARA CIERTAS PÁGINAS) =====
-    # Inicializar df_filtrado
+    # FILTROS
     df_filtrado = pd.DataFrame()
-
-    # Solo mostrar filtros si no estamos en la página de análisis de consultas
     if pagina != "📋 Análisis de Consultas":
-        st.sidebar.header("🎯 Filtros Dependientes")
-        df_filtrado = df_base.copy() if not df_base.empty else pd.DataFrame()
+        st.sidebar.header("🎯 Filtros")
+        df_filtrado = df_base.copy()
 
-        if not df_base.empty:
-            # ===== FILTRO POR PERIODO =====
-            if "Periodo Meta" in df_filtrado.columns:
-                # Obtener periodos únicos
-                periodos_unicos = sorted(
-                    [str(p) for p in df_filtrado["Periodo Meta"].dropna().unique()]
-                )
-                periodos = ["Todos"] + periodos_unicos
+        if "Periodo Meta" in df_filtrado.columns:
+            periodos = ["Todos"] + sorted(
+                [str(p) for p in df_filtrado["Periodo Meta"].dropna().unique()]
+            )
+            periodo_sel = st.sidebar.selectbox("📅 Periodo Meta:", periodos)
+            if periodo_sel != "Todos":
+                df_filtrado = df_filtrado[
+                    df_filtrado["Periodo Meta"].astype(str) == periodo_sel
+                ]
 
-                # Selector de periodo
-                periodo_sel = st.sidebar.selectbox(
-                    "📅 Periodo Meta:",
-                    periodos,
-                    help="Filtra los datos por periodo académico",
-                )
+        if "Programa Academico" in df_filtrado.columns:
+            programas = ["Todos"] + sorted(
+                [str(p) for p in df_filtrado["Programa Academico"].dropna().unique()]
+            )
+            programa_sel = st.sidebar.selectbox("🎓 Programa:", programas)
+            if programa_sel != "Todos":
+                df_filtrado = df_filtrado[
+                    df_filtrado["Programa Academico"].astype(str) == programa_sel
+                ]
 
-                # Aplicar filtro
-                if periodo_sel != "Todos":
-                    df_filtrado = df_filtrado[
-                        df_filtrado["Periodo Meta"].astype(str) == periodo_sel
-                    ]
+        if "Fuente Clasificada" in df_filtrado.columns:
+            fuentes = ["Todos"] + sorted(
+                [str(f) for f in df_filtrado["Fuente Clasificada"].dropna().unique()]
+            )
+            fuente_sel = st.sidebar.selectbox("📢 Fuente:", fuentes)
+            if fuente_sel != "Todos":
+                df_filtrado = df_filtrado[
+                    df_filtrado["Fuente Clasificada"].astype(str) == fuente_sel
+                ]
 
-            # ===== FILTRO POR PROGRAMA ACADÉMICO =====
-            if "Programa Academico" in df_filtrado.columns:
-                # Obtener programas únicos
-                programas_unicos = sorted(
-                    [
-                        str(p)
-                        for p in df_filtrado["Programa Academico"].dropna().unique()
-                    ]
-                )
-                programas = ["Todos"] + programas_unicos
-
-                # Selector de programa
-                programa_sel = st.sidebar.selectbox(
-                    "🎓 Programa Académico:",
-                    programas,
-                    help="Filtra los datos por programa académico",
-                )
-
-                # Aplicar filtro
-                if programa_sel != "Todos":
-                    df_filtrado = df_filtrado[
-                        df_filtrado["Programa Academico"].astype(str) == programa_sel
-                    ]
-
-            # ===== FILTRO POR FUENTE =====
-            if "Fuente Clasificada" in df_filtrado.columns:
-                # Obtener fuentes únicas
-                fuentes_unicas = sorted(
-                    [
-                        str(f)
-                        for f in df_filtrado["Fuente Clasificada"].dropna().unique()
-                    ]
-                )
-                fuentes = ["Todos"] + fuentes_unicas
-
-                # Selector de fuente
-                fuente_sel = st.sidebar.selectbox(
-                    "📢 Fuente Clasificada:",
-                    fuentes,
-                    help="Filtra los datos por fuente de marketing (Meta, Google, etc.)",
-                )
-
-                # Aplicar filtro
-                if fuente_sel != "Todos":
-                    df_filtrado = df_filtrado[
-                        df_filtrado["Fuente Clasificada"].astype(str) == fuente_sel
-                    ]
-
-    # ===== HEADER PRINCIPAL =====
-    # Mostrar fecha actual
-    fecha_actual = pd.Timestamp.now().strftime("%d de %B de %Y")
+    # HEADER PRINCIPAL
+    fecha_actual = datetime.now().strftime("%d de %B de %Y")
     st.markdown(f'<div class="fecha">📅 {fecha_actual}</div>', unsafe_allow_html=True)
-
-    # Título principal
     st.markdown(
         '<p class="main-title">🏫 Dashboard MMM & Proyecciones de Cierre - Multi-Agente</p>',
         unsafe_allow_html=True,
     )
     st.write("---")
 
-    # ===== RENDERIZADO DE PÁGINAS =====
+    # RENDERIZADO DE PÁGINAS
     try:
-        # ===== PÁGINA 1: PRESENTACIÓN Y MODELO =====
         if pagina == "📊 Presentación y Modelo":
-            if not df_base.empty:
-                # Mostrar reseña de modelos
-                mostrar_resena_modelos()
-                st.markdown("---")
-                # Renderizar página de presentación
-                presentacion.render(df_base)
-            else:
-                st.warning(
-                    "⚠️ No hay datos para mostrar. Verifica que el archivo seleccionado sea válido."
-                )
+            mostrar_resena_modelos()
+            st.write("---")
+            st.dataframe(df_base, use_container_width=True)
 
-        # ===== PÁGINA 2: RESULTADOS EJECUTIVOS =====
         elif pagina == "📈 Resultados Ejecutivos":
-            if not df_base.empty:
-                # Renderizar página de resultados con datos filtrados y completos
-                resultados.render(df_filtrado, df_base)
-            else:
-                st.warning(
-                    "⚠️ No hay datos para mostrar. Verifica que el archivo seleccionado sea válido."
-                )
+            # AQUÍ SE LLAMA A LA FUNCIÓN RENDER
+            render_resultados(df_filtrado, df_base)
 
-        # ===== PÁGINA 3: ANÁLISIS DE CONSULTAS =====
-        else:  # "📋 Análisis de Consultas"
+        else:
             mostrar_tabla_analisis()
 
-    except AttributeError as e:
-        # Error específico para funciones de páginas
-        st.error(f"Error al renderizar la página: {e}")
-        st.info("""
-        **Posibles causas:**
-        1. Los archivos en `paginas/` no tienen la función `render()`
-        2. La función `render()` tiene parámetros incorrectos
-        3. El archivo `paginas/__init__.py` no existe
-        """)
     except Exception as e:
-        # Error genérico
-        st.error(f"Error al renderizar la página: {e}")
+        st.error(f"Error al renderizar: {e}")
 
-    # ===== FOOTER =====
+    # FOOTER
     st.markdown(
-        f"""<div class="footer">
-    <p>📊 Dashboard MMM - CUN &nbsp;|&nbsp; Versión 3.0 &nbsp;|&nbsp; 
-    <span style="color: #7FBC03;">Datos actualizados al corte de julio 2026</span></p>
-    <p style="font-size: 10px; color: #999;">Desarrollado por el equipo de Data & Analytics - CUN</p>
-    <p style="font-size: 10px; color: #999;">📁 Archivo activo: {archivo_seleccionado if 'archivo_seleccionado' in locals() else 'Archivo subido manualmente'}</p>
-</div>""",
+        f"""
+    <div class="footer">
+        <p>📊 Dashboard MMM - CUN | Versión 3.0 | Datos actualizados julio 2026</p>
+        <p style="font-size:10px;color:#999;">📁 Archivo: {archivo_seleccionado}</p>
+    </div>
+    """,
         unsafe_allow_html=True,
     )
 
 
-# =============================================================================
-# 10. PUNTO DE ENTRADA
-# =============================================================================
 if __name__ == "__main__":
     main()
